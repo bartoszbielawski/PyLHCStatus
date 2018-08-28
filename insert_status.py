@@ -9,14 +9,13 @@ import xml.etree.ElementTree as ET
 
 contents = urllib.request.urlopen("http://alicedcs.web.cern.ch/AliceDCS/monitoring/screenshots/rss.xml").read()
 
-
 lhcStateDict = {}
 root = ET.fromstring(contents)
 for entry in root.iterfind("channel/item/title"):
-    name, value = entry.text.split(":", 2)
+    name, value = entry.text.split(":", 1)
     lhcStateDict[name.strip()] = value.strip()
 
-engine = create_engine('sqlite:///pylhcstatus.db')
+engine = create_engine('sqlite:////home/caladan/PyLHCStatus/pylhcstatus.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)

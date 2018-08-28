@@ -16,8 +16,9 @@ class PyLHCStatus(Base):
 
     @staticmethod
     def create_db(filename):
-        engine = create_engine(f'sqlite:///{filename}.db')
+        engine = create_engine("sqlite:///" + filename + ".db")
         Base.metadata.create_all(engine)
 
 
-
+if __name__ == "__main__":
+    PyLHCStatus.create_db("pylhcstatus")
