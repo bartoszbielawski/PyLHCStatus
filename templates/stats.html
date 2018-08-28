@@ -6,7 +6,7 @@
 <div>
     Elements: {{ total }}<br>
     {% for key, value in counter.items() %}
-        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 }} % <br>
+        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 |round|int}} % <br>
     {% endfor %}
 </div>
 </body>

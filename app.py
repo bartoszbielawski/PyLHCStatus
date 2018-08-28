@@ -26,13 +26,11 @@ def hello_world():
 @app.route("/stats/<int:hours>")
 def stats(hours=24):
     delta = datetime.now() - timedelta(hours=hours)
+    print(delta)
     session = open_database()
-    all_entries = session.query(PyLHCStatus).filter(PyLHCStatus.timestamp > delta).all()
-
-    beam_modes = list(map(lambda x: x[0], session.query(PyLHCStatus.beam_mode).all()))
+    beam_modes = list(map(lambda x: x[0], session.query(PyLHCStatus.beam_mode).filter(PyLHCStatus.timestamp > delta).all()))
 
     from collections import Counter
-
     counter = Counter(beam_modes)
     return render_template("stats.html", hours=hours, counter=counter, total=len(beam_modes))
 
