@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>Stats for the last {{ hours }} hours</title>
+</head>
+<body>
+<div>
+    Elements: {{ total }}<br>
+    {% for key, value in counter.items() %}
+        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 }} % <br>
+    {% endfor %}
+</div>
+</body>
+</html>

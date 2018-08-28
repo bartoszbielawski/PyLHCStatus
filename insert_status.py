@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from config import DB_PATH
 from pylhcstatus import PyLHCStatus, Base
 import datetime
 
@@ -15,7 +16,7 @@ for entry in root.iterfind("channel/item/title"):
     name, value = entry.text.split(":", 1)
     lhcStateDict[name.strip()] = value.strip()
 
-engine = create_engine('sqlite:////home/caladan/PyLHCStatus/pylhcstatus.db')
+engine = create_engine(DB_PATH)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
