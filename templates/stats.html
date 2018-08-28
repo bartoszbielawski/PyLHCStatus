@@ -1,13 +1,49 @@
 <html>
 <head>
     <title>Stats for the last {{ hours }} hours</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+
 </head>
 <body>
 <div>
     Elements: {{ total }}<br>
     {% for key, value in counter.items() %}
-        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 |round|int}} % <br>
+        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 | round| int }} % <br>
     {% endfor %}
+    <br>
+    <br>
+    <canvas id="myChart" width="400" , height="75%"></canvas>
 </div>
+<script>
+    var labels = {{ counter.keys() | list | safe }};
+    var data = {{ counter.values() | list | safe }};
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '# of Votes',
+                data: data,
+                backgroundColor: ["#3e9876",
+                    "#cd43c2",
+                    "#5aa23a",
+                    "#7549d0",
+                    "#b98533",
+                    "#6082cb",
+                    "#db4a2f",
+                    "#6d408c",
+                    "#687630",
+                    "#da3975",
+                    "#8a3d23",
+                    "#c170b9",
+                    "#d2775a",
+                    "#8d3859",
+                    "#cf6677"],
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
 </body>
 </html>
