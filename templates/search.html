@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>Search: {{ keyword }}, Found: {{ entries | length }}</title>
+    <style>
+        th, td {
+            border: 1px dashed black;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Beam Mode</th>
+            <th>Beam Energy</th>
+            <th>Comment</th>
+        </tr>
+
+        {% for entry in entries %}
+            <tr>
+                <td>{{ entry.timestamp }}</td>
+                <td>{{ entry.beam_mode }}</td>
+                <td>{{ entry.beam_energy }} GeV</td>
+                <td>{{ entry.comment }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

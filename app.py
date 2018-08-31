@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from flask import Flask, render_template
+
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -18,6 +19,7 @@ def open_database():
     session = DBSession()
     return session
 
+
 @app.route('/')
 def hello_world():
     return render_template("main.html")
@@ -33,8 +35,9 @@ beam_mode_order = ["NO BEAM",
                    "ADJUST",
                    "SQUEEZE",
                    "STABLE BEAMS",
+                   "BEAM DUMP",
                    "RAMP DOWN",
-                   "CYCLING"];
+                   "CYCLING"]
 
 
 @app.route("/stats/<int:hours>")
@@ -42,7 +45,8 @@ def stats(hours=24):
     delta = datetime.now() - timedelta(hours=hours)
     print(delta)
     session = open_database()
-    beam_modes = list(map(lambda x: x[0], session.query(PyLHCStatus.beam_mode).filter(PyLHCStatus.timestamp > delta).all()))
+    beam_modes = list(
+        map(lambda x: x[0], session.query(PyLHCStatus.beam_mode).filter(PyLHCStatus.timestamp > delta).all()))
 
     from collections import Counter, OrderedDict
     counter = Counter(beam_modes)
@@ -65,6 +69,22 @@ def lastN(number):
     all_records = session.query(PyLHCStatus).order_by(PyLHCStatus.timestamp.desc()).limit(number).all()
 
     return render_template("lastStates.html", entries=all_records)
+
+
+@app.route("/search/<string:keyword>")
+def search(keyword=None):
+    engine = create_engine(DB_PATH)
+    Base.metadata.bind = engine
+
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+
+    filtered_records = session.query(PyLHCStatus) \
+        .order_by(PyLHCStatus.timestamp.desc()) \
+        .filter(PyLHCStatus.comment.contains(keyword)) \
+        .all()
+
+    return render_template("search.html", entries=filtered_records)
 
 if __name__ == '__main__':
     app.run()
