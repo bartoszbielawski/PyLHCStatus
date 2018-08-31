@@ -8,33 +8,38 @@ import datetime
 import urllib.request
 import xml.etree.ElementTree as ET
 
-contents = urllib.request.urlopen("http://alicedcs.web.cern.ch/AliceDCS/monitoring/screenshots/rss.xml").read()
 
-lhcStateDict = {}
-root = ET.fromstring(contents)
-for entry in root.iterfind("channel/item/title"):
-    name, value = entry.text.split(":", 1)
-    lhcStateDict[name.strip()] = value.strip()
+def main():
+    try:
+        contents = urllib.request.urlopen("http://alicedcs.web.cern.ch/AliceDCS/monitoring/screenshots/rss.xml").read()
+    except urllib.error.HTTPError as http_error:
+        return
 
-engine = create_engine(DB_PATH)
-Base.metadata.bind = engine
+    lhc_state_dict = {}
+    root = ET.fromstring(contents)
+    for entry in root.iterfind("channel/item/title"):
+        name, value = entry.text.split(":", 1)
+        lhc_state_dict[name.strip()] = value.strip()
 
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+    engine = create_engine(DB_PATH)
+    Base.metadata.bind = engine
 
-beamEnergy = int(lhcStateDict["BeamEnergy"].split()[0])
-beamMode = lhcStateDict["LhcBeamMode"]
-machineMode = lhcStateDict["LhcMachineMode"]
-comment = lhcStateDict["LhcPage1"]
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
 
-new_state = PyLHCStatus(beam_energy=beamEnergy,
-                      beam_mode=beamMode,
-                      machine_mode=machineMode,
-                      comment=comment,
-                      timestamp=datetime.datetime.now())
-session.add(new_state)
-session.commit()
+    beam_energy = int(lhc_state_dict["BeamEnergy"].split()[0])
+    beam_mode = lhc_state_dict["LhcBeamMode"]
+    machine_mode = lhc_state_dict["LhcMachineMode"]
+    comment = lhc_state_dict["LhcPage1"]
 
-# last24h = datetime.datetime.now() - datetime.timedelta(minutes=3)
-#
-# print(session.query(LHCStatus).filter(LHCStatus.timestamp < last24h).all())
+    new_state = PyLHCStatus(beam_energy=beam_energy,
+                            beam_mode=beam_mode,
+                            machine_mode=machine_mode,
+                            comment=comment,
+                            timestamp=datetime.datetime.now())
+    session.add(new_state)
+    session.commit()
+
+if __name__ == "__main__":
+    main()
+
