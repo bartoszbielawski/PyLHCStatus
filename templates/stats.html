@@ -7,15 +7,14 @@
 <body>
 <div>
     Elements: {{ total }}<br>
-    {% for key, value in counter.items() %}
-        <b>{{ key }}</b> - {{ value }} - {{ value / total * 100 | round| int }} % <br>
-    {% endfor %}
-    <br>
-    <br>
-    <canvas id="myChart" width="400" , height="75%"></canvas>
+    {% if total > 0 %}
+        <canvas id="myChart" width="400" , height="75%"></canvas>
+    {% endif %}
+
 </div>
 <script>
-    var labels = {{ counter.keys() | list | safe }};
+    var labels = [{% for key, value in counter.items() %} "{{ key }} - {{ (value / total * 100) | round| int }} %", {% endfor %}]
+
     var data = {{ counter.values() | list | safe }};
     var ctx = document.getElementById("myChart").getContext('2d');
     var myChart = new Chart(ctx, {
@@ -23,7 +22,7 @@
         data: {
             labels: labels,
             datasets: [{
-                label: '# of Votes',
+                label: '# of samples',
                 data: data,
                 backgroundColor: ["#3e9876",
                     "#cd43c2",
@@ -42,6 +41,12 @@
                     "#cf6677"],
                 borderWidth: 1
             }]
+        },
+        options: {
+            legend: {
+                display: true,
+                position: 'left',
+            }
         }
     });
 </script>

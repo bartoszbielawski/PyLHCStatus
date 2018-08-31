@@ -23,6 +23,20 @@ def hello_world():
     return render_template("main.html")
 
 
+beam_mode_order = ["NO BEAM",
+                   "SETUP",
+                   "INJECTION PROBE BEAM",
+                   "INJECTION PHYSICS BEAM",
+                   "PREPARE RAMP",
+                   "RAMP",
+                   "FLAT TOP",
+                   "ADJUST",
+                   "SQUEEZE",
+                   "STABLE BEAMS",
+                   "RAMP DOWN",
+                   "CYCLING"];
+
+
 @app.route("/stats/<int:hours>")
 def stats(hours=24):
     delta = datetime.now() - timedelta(hours=hours)
@@ -30,9 +44,14 @@ def stats(hours=24):
     session = open_database()
     beam_modes = list(map(lambda x: x[0], session.query(PyLHCStatus.beam_mode).filter(PyLHCStatus.timestamp > delta).all()))
 
-    from collections import Counter
+    from collections import Counter, OrderedDict
     counter = Counter(beam_modes)
-    return render_template("stats.html", hours=hours, counter=counter, total=len(beam_modes))
+    orderedCounter = OrderedDict()
+
+    for beam_mode in beam_mode_order:
+        orderedCounter[beam_mode] = counter.get(beam_mode, 0)
+
+    return render_template("stats.html", hours=hours, counter=orderedCounter, total=len(beam_modes))
 
 
 @app.route("/last/<int:number>")
